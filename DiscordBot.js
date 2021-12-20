@@ -10,7 +10,7 @@ const allIntents = new Intents(32767);
 const client = new Client({ intents: allIntents });
 
 const desc = ["Nacho, el niño virgo", "Barco, el bocho", "Alejo, la gorda", "Fer, el niño de cristal", "Yano, el autista", "Lotzo, el hippie", "Morgan <3", "Alva, El chichi Peralta", "Nacho, el simp", "Eroncho, ¿Jugó Platini?"];
-const comandos = [".peron", ".virgo" ,".masgrande", ".lumpen", ".svinfo", ".frase", ".tetona",".move @user <canal>",".mute @user <segundos>",".deaf @user <segundos>"]
+const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>"
 const frase = ["Ño Ño", "MUY pelotudo!", "Per di da zo", "Este tipo está quemado", "Dea dea", "No me la container", "No da más de pelotudo", "Sí nene", "Dale negrito", "Se va muteado", "Bien muteado", "Bien muerto", "Olvidafter", "Niño de cristal", "Poco huevo", "Naaaashe", "Ido", "MOOOY PICUSO", "EL REY"];
 const boca = ["https://imgur.com/MW4zdiA.png", "https://imgur.com/riL4WUY.png", "https://imgur.com/Qbvaevv.png", "https://imgur.com/cJRRTgA.png", "https://imgur.com/XiM7gGc.png", "https://imgur.com/iCs5PQU.png", "https://imgur.com/PBElkZ0.png", "https://imgur.com/3frkUvM.png", "https://imgur.com/nbAuGtd.png", "https://imgur.com/aG0BPWa.png"]
 let DJ;
@@ -18,7 +18,9 @@ const prefix = ".";
 //const fmove=require('./comms/move.js');
 const { joinVoiceChannel,createAudioPlayer,createAudioResource,entersState,StreamType,AudioPlayerStatus,VoiceConnectionStatus, } = require('@discordjs/voice');
 const { match } = require('assert');
-var isPlaying=false
+var isPlaying=false;
+var queue=[];
+var tiempo=0;
 
 client.on('ready', () =>{
     console.log("Connected as " + client.user.tag)
@@ -34,7 +36,7 @@ client.on('ready', () =>{
             const attach = new MessageAttachment("https://imgur.com/0kMQabL.png")
             message.channel.send(attach);
         }
-        if(message.content === prefix + 'masgrande'){
+        /*if(message.content === prefix + 'masgrande'){
             var randomValue = boca[Math.floor(Math.random() * boca.length)];
             const attach = new MessageAttachment(randomValue);
             message.channel.send(`${message.author},`, attach);
@@ -53,7 +55,7 @@ client.on('ready', () =>{
                 message.channel.send('Reproduciendo ahora: LA 12 PAPÁ');
                 message.delete();
             }).catch(err => console.log(err));
-        }
+        }*/
         if(message.content == prefix + 'cristal'){
             message.channel.send("El top se actualizo!")
             message.channel.send("Top 5 niños de cristal: \n 1) Eroncho.\n 2) Fernan floo.\n 3) Lotzo.\n 4) Luxipoo.\n 5) Alejo \"Tetona\" Marquez.  ");
@@ -83,7 +85,7 @@ client.on('ready', () =>{
                 message.channel.send(infosv);
         }
         if(message.content === prefix + 'comandos'){
-                message.channel.send(comandos)
+                message.channel.send(comandos.toString())
         }
         if(message.content === prefix + 'tetona'){
             const attach = new MessageAttachment("https://imgur.com/q5FFURg.png")
@@ -110,6 +112,10 @@ client.on('ready', () =>{
         const args = message.content.split(/ +/g);
         const comm = args.shift().toLowerCase();
         const Membed = new Discord.MessageEmbed();
+
+        if(comm.match(/^\.(?!play|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona|comandos|disconnect)/g)){
+            message.channel.send('Comando equivocado');
+        }
 
         if(comm==='.move'){
             console.log(comm+' || '+Date()+` || ${message.author.username}`);
@@ -433,12 +439,13 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm==='.play'){
             console.log(comm+' || '+Date()+` || ${message.author.username}`);
-            try {
+            try {                
                 const connection = await joinVoiceChannel({
                     channelId: message.member.voice.channel.id,
                     guildId: message.guild.id,
                     adapterCreator: message.guild.voiceAdapterCreator
                 })
+               
                 const videoFinder = async (query) =>{
                     const videoResult= await ytSearch(query);
                     return (videoResult.videos.length>1)? videoResult.videos[0] : null;
@@ -448,25 +455,70 @@ client.on('ready', () =>{
                     const player = createAudioPlayer();
                     const stream = ytdl(video.url,{filter:'audioonly',highWaterMark: 1 << 25,});
                     const rsrc = createAudioResource(stream,{inputType:StreamType.Arbitrary});
-                    
+                    queue.push(rsrc)
                     var duracion = video.duration.toString().split(/ +/g);
-                    var tiempo = (parseInt(duracion[0])+3)*1000
+                    tiempo = (parseInt(duracion[0])+3)*1000
+                    
+                    if(isPlaying==false){
+                        play();
+                    }
 
-                    connection.subscribe(player)
-                    player.play(rsrc);
-                    setTimeout(() => {
-                        connection.destroy();    
-                    }, tiempo);
+                    function play (){
+                        connection.subscribe(player);
+                        player.play(queue[0]);
+                        isPlaying=true
+                        setTimeout(() => {
+                            queue.shift()
+                            if(queue.length>0){
+                                play();
+                            }else{
+                                connection.destroy();
+                                isPlaying=false; 
+                            }
+                        }, tiempo);
+                    }
     
                     message.channel.send(video.url+" ");
                     message.channel.send(video.duration.toString());
                 }
             } catch (error) {
-                message.channel.send('No se encontro ningun video >:|');
+                message.channel.send('No se encontro ningun video >:| '+error);
             }
         }
-        if(comm.match(/^\.(?!play|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona)/g)){
-            message.channel.send('Comando equivocado');
+
+        if(comm=='.masgrande'){
+            var randomValue = boca[Math.floor(Math.random() * boca.length)];
+            const attach = new MessageAttachment(randomValue);
+            message.channel.send(`${message.author},`,attach);
+            //message.channel.send({content: `${message.author.username}`, files: [{ attachment: attach }]});
+
+            const connection = await joinVoiceChannel({
+                channelId: message.member.voice.channel.id,
+                guildId: message.guild.id,
+                adapterCreator: message.guild.voiceAdapterCreator
+            })
+            
+            const player = createAudioPlayer();
+            const stream = ytdl("https://www.youtube.com/watch?v=Emp7ntPJm2w&ab_channel=chicho641",{filter:'audioonly',highWaterMark: 1 << 25,});
+            const rsrc = createAudioResource(stream,{inputType:StreamType.Arbitrary});
+                    
+            connection.subscribe(player);
+            player.play(rsrc);
+                        
+            setTimeout(() => {
+                connection.destroy();   
+            }, 150000);
+
+            message.channel.send('Reproduciendo ahora: LA 12 PAPÁ');
+        }
+
+        if(comm=='.disconnect'){
+            joinVoiceChannel({
+                channelId: message.member.voice.channel.id,
+                guildId: message.guild.id,
+                adapterCreator: message.guild.voiceAdapterCreator
+            }).destroy();
+            message.channel.send('Chao');
         }
         
     //-----------------------------------------------------------------------------------------------------------------------------------------------------
