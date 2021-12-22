@@ -472,7 +472,11 @@ client.on('ready', () =>{
                             if(queue.length>0){
                                 play();
                             }else{
-                                connection.destroy();
+                                try {
+                                    connection.destroy(); 
+                                } catch (error) {
+                                    console.log(error);
+                                }  
                                 isPlaying=false; 
                             }
                         }, tiempo);
@@ -512,7 +516,11 @@ client.on('ready', () =>{
             player.play(rsrc);
                         
             setTimeout(() => {
-                connection.destroy();   
+                try {
+                    connection.destroy(); 
+                } catch (error) {
+                    console.log(error);
+                }  
             }, 150000);
 
             Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
@@ -535,7 +543,7 @@ client.on('ready', () =>{
             if(message.mentions.members.first()===undefined){
                 message.channel.send("@ a alguien para jugar");
             }else{
-                var boton=[], jugador=[], turno=0, pieza='🔴',fin=false; 
+                var boton=[], jugador=[], turno=0, pieza='🔴',fin=false, comb=0; 
                 jugador[0]=message.author.id, jugador[1]=message.mentions.members.first().id;
 
                 for (let index = 0; index < 9; index++) {
@@ -556,12 +564,12 @@ client.on('ready', () =>{
                 });
 
                 const filter = i => i.customId === 'aceptar'||'rechazar'||"1"||"2"||"3"||"4"||"5"||"6"||"7"||"8"||"0";
-                const collector = message.channel.createMessageComponentCollector({ filter, time: 20000 });
+                const collector = message.channel.createMessageComponentCollector({ filter, time: 15000 });
 
                 collector.on('collect', async i => {
                     if (i.customId == 'aceptar' && i.user.id==jugador[1]) {
                         collector.resetTimer();
-                        Membed.addFields({ name: '--------------------------------------', value: `Partida aceptada, empieza ${message.author.username}`, inline: false },);
+                        Membed.addFields({ name: '--------------------------------------', value: `Partida aceptada, empieza ${message.author.username} con 🔴`, inline: false },);
                         i.update({embeds: [Membed],
                             components: [
                                 {type: 1, components: [ boton[0], boton[1], boton[2], ]},
@@ -588,10 +596,31 @@ client.on('ready', () =>{
                                     });
                                 }
                             }
-                            if(  (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-') || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-') || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-') 
-                            || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-') || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-') || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-')
-                            || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[6].label!='-') || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-') ){
+                            if(  (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-', comb=1) || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-', comb=2) || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-', comb=3) 
+                            || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-', comb=4) || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-', comb=5) || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-', comb=6)
+                            || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[8].label!='-', comb=7) || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-', comb=8) ){
                                 message.channel.send(`${'<@'+jugador[turno]+'>'} gano la partida`);
+                                fin=true;
+                                switch (comb) {
+                                    case 1: boton[0].label='SUCCESS'; boton[1].label='SUCCESS'; boton[2].label='SUCCESS'; break;
+                                    case 2: boton[3].label='SUCCESS'; boton[4].label='SUCCESS'; boton[5].label='SUCCESS'; break;
+                                    case 3: boton[6].label='SUCCESS'; boton[7].label='SUCCESS'; boton[8].label='SUCCESS'; break;
+                                    case 4: boton[0].label='SUCCESS'; boton[3].label='SUCCESS'; boton[6].label='SUCCESS'; break;
+                                    case 5: boton[1].label='SUCCESS'; boton[4].label='SUCCESS'; boton[7].label='SUCCESS'; break;
+                                    case 6: boton[2].label='SUCCESS'; boton[5].label='SUCCESS'; boton[8].label='SUCCESS'; break;
+                                    case 7: boton[0].label='SUCCESS'; boton[4].label='SUCCESS'; boton[8].label='SUCCESS'; break;
+                                    case 8: boton[2].label='SUCCESS'; boton[4].label='SUCCESS'; boton[6].label='SUCCESS'; break;
+                                }
+                                i.update({embeds: [Membed],
+                                    components: [
+                                        {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                        {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                        {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                    ] 
+                                });
+                                collector.stop();
+                            }else if(boton[4].label!='-' && (boton[3].label!='-' && boton[1].label!='-' && boton[5].label!='-' && boton[7].label!='-') || (boton[0].label!='-' && boton[2].label!='-' && boton[6].label!='-' && boton[8].label!='-') ){
+                                message.channel.send('Empate');
                                 fin=true;
                                 collector.stop()
                             }
@@ -628,6 +657,7 @@ client.on('ready', () =>{
                 adapterCreator: message.guild.voiceAdapterCreator
             }).destroy();
             message.channel.send('Chao');
+            isPlaying=false; queue=[]
         }
         
     //-----------------------------------------------------------------------------------------------------------------------------------------------------
