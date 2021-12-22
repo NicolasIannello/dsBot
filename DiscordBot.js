@@ -1,5 +1,5 @@
 //Token ODAxMzAxNDg1ODAzMDEyMTI2.YAesKQ.pFG7cC5CmZz_-hJYryhBkPRh4kg
-const { Client, MessageAttachment, Permissions ,Intents} = require('discord.js');
+const { Client, MessageAttachment, Permissions ,Intents,MessageActionRow, MessageButton} = require('discord.js');
 const Discord = require('discord.js');
 const inspector = require('inspector');
 const ytdl = require('ytdl-core');
@@ -113,7 +113,7 @@ client.on('ready', () =>{
         const comm = args.shift().toLowerCase();
         const Membed = new Discord.MessageEmbed();
 
-        if(comm.match(/^\.(?!play|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona|comandos|disconnect)/g)){
+        if(comm.match(/^\.(?!play|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona|comandos|disconnect|tateti)/g)){
             message.channel.send('Comando equivocado');
         }
 
@@ -199,7 +199,7 @@ client.on('ready', () =>{
                 i=(i+1)*0.6;
                 i=Math.trunc(i);
 
-                Membed.setColor('#0099ff').setAuthor(`${message.author.username}`, message.author.avatarURL()).setThumbnail(message.author.avatarURL())
+                Membed.setColor('#0099ff')/*.setAuthor(`${message.author.username}`, message.author.avatarURL())*/.setThumbnail(message.author.avatarURL())
                 .addFields(
                     { name: "Votos a favor", value: si+'/'+i, inline: true },
                     { name: 'Votos en contra', value: no+'/'+i, inline: true },
@@ -229,7 +229,7 @@ client.on('ready', () =>{
                     throw "jejox";
                 }
              
-                message.channel.send(Membed).then(embdReact => {
+                message.channel.send({embeds: [Membed]}).then(embdReact => {
                     embdReact.react('🟩');
                     embdReact.react('🟥');
                     embdReact.react('⛔');
@@ -242,7 +242,7 @@ client.on('ready', () =>{
 
                     setTimeout(()=>{ 
                         Membed.addFields({ name: `----------------------------------------`, value: 'Termino el tiempo de la votacion', inline: false },);
-                        embdReact.edit(Membed);
+                        embdReact.edit({embeds: [Membed]});
                         collector.stop();
                     },60000);
 
@@ -255,22 +255,22 @@ client.on('ready', () =>{
                                     si++;
                                     if(gil==true){
                                         Membed.fields[0] = { name: "Votos a favor", value: si+'/'+i, inline: true };
-                                        embdReact.edit(Membed);
+                                        embdReact.edit({embeds: [Membed]});
                                         //embdReact.edit(`Se fue al choto ${message.author}.  `+'Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear al gil de ${message.author}`);
                                     }else{
                                         Membed.fields[0] = { name: "Votos a favor", value: si+'/'+i, inline: true };
                                         //embdReact.edit('Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear a ${muteo}`+" por "+args[1]+'s');
-                                        embdReact.edit(Membed);
+                                        embdReact.edit({embeds: [Membed]});
                                     }
                                 }else if(reaction.emoji.name==='🟥'){
                                     no++;
                                     if(gil==true){
                                         Membed.fields[1] = { name: 'Votos en contra', value: no+'/'+i, inline: true };
-                                        embdReact.edit(Membed);
+                                        embdReact.edit({embeds: [Membed]});
                                         //embdReact.edit(`Se fue al choto ${message.author}.  `+'Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear al gil de ${message.author}`);
                                     }else{
                                         Membed.fields[1] = { name: 'Votos en contra', value: no+'/'+i, inline: true };
-                                        embdReact.edit(Membed);
+                                        embdReact.edit({embeds: [Membed]});
                                         //embdReact.edit('Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear a ${muteo}`+" por "+args[1]+'s');
                                     }
                                 }
@@ -283,7 +283,7 @@ client.on('ready', () =>{
                                     collector.stop();
                                 }else if(no>=i){
                                     Membed.addFields({ name: `----------------------------------------`, value: `${muteo} safo, cagones`, inline: false },);
-                                    embdReact.edit(Membed);
+                                    embdReact.edit({embeds: [Membed]});
                                     //message.channel.send("Safaste pipi");
                                     collector.stop();
                                 }
@@ -296,7 +296,7 @@ client.on('ready', () =>{
                                     spam=true;
                                 }else if(gil==false){
                                     Membed.addFields({ name: "Se cancelo la votacion", value: 'CAGON', inline: false },);
-                                    embdReact.edit(Membed);
+                                    embdReact.edit({embeds: [Membed]});
                                    // embdReact.edit(`${user} cancelo la votacion`);
                                     collector.stop();
                                 }
@@ -319,7 +319,7 @@ client.on('ready', () =>{
                             //message.channel.send("Ensordeci3");
                             Membed.addFields({ name:`----------------------------------------`, value: `${muteo} se fue ensordeci3, fucking virgil`, inline: false },);
                         }
-                        embdReact.edit(Membed);
+                        embdReact.edit({embeds: [Membed]});
                     }
                     function Gil(){
                         //muteo=message.member;
@@ -488,9 +488,6 @@ client.on('ready', () =>{
 
         if(comm=='.masgrande'){
             var randomValue = boca[Math.floor(Math.random() * boca.length)];
-            const attach = new MessageAttachment(randomValue);
-            message.channel.send(`${message.author},`,attach);
-            //message.channel.send({content: `${message.author.username}`, files: [{ attachment: attach }]});
 
             const connection = await joinVoiceChannel({
                 channelId: message.member.voice.channel.id,
@@ -509,7 +506,92 @@ client.on('ready', () =>{
                 connection.destroy();   
             }, 150000);
 
-            message.channel.send('Reproduciendo ahora: LA 12 PAPÁ');
+            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            /*.setTitle(`${message.author.username}`)*/.setImage(randomValue)
+            .addFields({ name: 'Reproduciendo ahora: ', value: 'LA 12 PAPÁ', inline: false },);
+
+            message.channel.send({embeds: [Membed]});
+        }
+
+        if(comm=='.tateti'){
+            if(message.mentions.members.first()===undefined){
+                message.channel.send("@ a alguien para jugar");
+            }else{
+                var boton=[], jugador=[], turno=0, pieza='🔴',fin=false; 
+                jugador[0]=message.author.id, jugador[1]=message.mentions.members.first().id;
+
+                for (let index = 0; index < 9; index++) {
+                    boton[index]={type: 2, label: "-", style: 'SECONDARY', custom_id: index, disabled: false};
+                }
+
+                Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+                .setTitle('TaTeTi').setThumbnail(message.author.avatarURL())
+                .addFields({ name: 'Partida: ', value: `${message.author.username} VS ${message.mentions.members.first()}`, inline: false },);
+                
+                message.channel.send({embeds: [Membed],
+                    components: [
+                        {type: 1, components: [
+                                {type: 2, label: "Aceptar", style: 'SUCCESS', custom_id: "aceptar"},
+                                {type: 2, label: "Rechazar", style: 'DANGER', custom_id: "rechazar"},
+                        ]},
+                    ]
+                });
+
+                const filter = i => i.customId === 'aceptar'||'rechazar'||"1"||"2"||"3"||"4"||"5"||"6"||"7"||"8"||"0";
+                const collector = message.channel.createMessageComponentCollector({ filter, time: 20000 });
+
+                collector.on('collect', async i => {
+                    if (i.customId == 'aceptar' && i.user.id==jugador[1]) {
+                        collector.resetTimer();
+                        Membed.addFields({ name: '--------------------------------------', value: `Partida aceptada, empieza ${message.author.username}`, inline: false },);
+                        i.update({embeds: [Membed],
+                            components: [
+                                {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                            ] 
+                        });
+                    }else if(i.customId=='rechazar' && i.user.id==jugador[1]){
+                        Membed.addFields({ name: '--------------------------------------', value: 'Partida rechazada', inline: false },);
+                        i.update({embeds: [Membed], components: [] });
+                    }else{
+                        if(i.user.id==jugador[turno]){
+                            collector.resetTimer();
+                            for (let index = 0; index < 9; index++) {
+                                if(i.customId==boton[index].custom_id){
+                                    boton[index].label=pieza;
+                                    boton[index].disabled=true
+                                    i.update({embeds: [Membed],
+                                        components: [
+                                            {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                            {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                            {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                        ] 
+                                    });
+                                }
+                            }
+                            if(  (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-') || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-') || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-') 
+                            || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-') || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-') || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-')
+                            || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[6].label!='-') || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-') ){
+                                message.channel.send(`${'<@'+jugador[turno]+'>'} gano la partida`);
+                                fin=true;
+                                collector.stop()
+                            }
+                            if(turno==0){
+                                turno=1;pieza='🔵';
+                            }else{
+                                turno=0;pieza='🔴';
+                            }
+                        }
+                    }
+                });
+
+                collector.on('end', async i => {
+                    if(fin==false){
+                        message.channel.send(`Se le acabo el tiempo a ${'<@'+jugador[turno]+'>'}`);
+                    }
+                });
+            }
         }
 
         if(comm=='.disconnect'){
