@@ -543,8 +543,14 @@ client.on('ready', () =>{
             if(message.mentions.members.first()===undefined){
                 message.channel.send("@ a alguien para jugar");
             }else{
-                var boton=[], jugador=[], turno=0, pieza='🔴',fin=false, comb=0; 
+                var boton=[], jugador=[], pieza='🔴',fin=false, cont=0, turno = Math.floor(Math.random() * 2); 
                 jugador[0]=message.author.id, jugador[1]=message.mentions.members.first().id;
+                
+                if(turno==0){
+                    turno=1;pieza='🔵';
+                }else{
+                    turno=0;pieza='🔴';
+                }
 
                 for (let index = 0; index < 9; index++) {
                     boton[index]={type: 2, label: "-", style: 'SECONDARY', custom_id: index, disabled: false};
@@ -569,7 +575,7 @@ client.on('ready', () =>{
                 collector.on('collect', async i => {
                     if (i.customId == 'aceptar' && i.user.id==jugador[1]) {
                         collector.resetTimer();
-                        Membed.addFields({ name: '--------------------------------------', value: `Partida aceptada, empieza ${message.author.username} con 🔴`, inline: false },);
+                        Membed.addFields({ name: '--------------------------------------', value: `Partida aceptada, empieza ${'<@'+jugador[turno]+'>'} con `+pieza, inline: false },);
                         i.update({embeds: [Membed],
                             components: [
                                 {type: 1, components: [ boton[0], boton[1], boton[2], ]},
@@ -580,9 +586,12 @@ client.on('ready', () =>{
                     }else if(i.customId=='rechazar' && i.user.id==jugador[1]){
                         Membed.addFields({ name: '--------------------------------------', value: 'Partida rechazada', inline: false },);
                         i.update({embeds: [Membed], components: [] });
+                        fin=true;
+                        collector.stop()
                     }else{
                         if(i.user.id==jugador[turno]){
                             collector.resetTimer();
+                            cont++;
                             for (let index = 0; index < 9; index++) {
                                 if(i.customId==boton[index].custom_id){
                                     boton[index].label=pieza;
@@ -596,30 +605,14 @@ client.on('ready', () =>{
                                     });
                                 }
                             }
-                            if(  (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-', comb=1) || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-', comb=2) || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-', comb=3) 
-                            || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-', comb=4) || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-', comb=5) || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-', comb=6)
-                            || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[8].label!='-', comb=7) || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-', comb=8) ){
+                            if( (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-') || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-') || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-') 
+                            || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-') || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-') || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-')
+                            || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[8].label!='-') || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-') )
+                            {
                                 message.channel.send(`${'<@'+jugador[turno]+'>'} gano la partida`);
                                 fin=true;
-                                switch (comb) {
-                                    case 1: boton[0].label='SUCCESS'; boton[1].label='SUCCESS'; boton[2].label='SUCCESS'; break;
-                                    case 2: boton[3].label='SUCCESS'; boton[4].label='SUCCESS'; boton[5].label='SUCCESS'; break;
-                                    case 3: boton[6].label='SUCCESS'; boton[7].label='SUCCESS'; boton[8].label='SUCCESS'; break;
-                                    case 4: boton[0].label='SUCCESS'; boton[3].label='SUCCESS'; boton[6].label='SUCCESS'; break;
-                                    case 5: boton[1].label='SUCCESS'; boton[4].label='SUCCESS'; boton[7].label='SUCCESS'; break;
-                                    case 6: boton[2].label='SUCCESS'; boton[5].label='SUCCESS'; boton[8].label='SUCCESS'; break;
-                                    case 7: boton[0].label='SUCCESS'; boton[4].label='SUCCESS'; boton[8].label='SUCCESS'; break;
-                                    case 8: boton[2].label='SUCCESS'; boton[4].label='SUCCESS'; boton[6].label='SUCCESS'; break;
-                                }
-                                i.update({embeds: [Membed],
-                                    components: [
-                                        {type: 1, components: [ boton[0], boton[1], boton[2], ]},
-                                        {type: 1, components: [ boton[3], boton[4], boton[5], ]},
-                                        {type: 1, components: [ boton[6], boton[7], boton[8], ]},
-                                    ] 
-                                });
                                 collector.stop();
-                            }else if(boton[4].label!='-' && (boton[3].label!='-' && boton[1].label!='-' && boton[5].label!='-' && boton[7].label!='-') || (boton[0].label!='-' && boton[2].label!='-' && boton[6].label!='-' && boton[8].label!='-') ){
+                            }else if(cont==9){
                                 message.channel.send('Empate');
                                 fin=true;
                                 collector.stop()
