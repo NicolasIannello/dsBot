@@ -539,7 +539,7 @@ client.on('ready', () =>{
 //---------|------|--------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
-        if(comm=='.tateti'){
+        if(comm=='.TTTog'){
             if(message.mentions.members.first()===undefined){
                 message.channel.send("@ a alguien para jugar");
             }else{
@@ -620,6 +620,181 @@ client.on('ready', () =>{
                             if(turno==0){
                                 turno=1;pieza='🔵';
                             }else{
+                                turno=0;pieza='🔴';
+                            }
+                        }
+                    }
+                });
+
+                collector.on('end', async i => {
+                    if(fin==false){
+                        message.channel.send(`Se le acabo el tiempo a ${'<@'+jugador[turno]+'>'}`);
+                    }
+                });
+            }
+        }
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//---------||----||--------------------------------------------------------------------------------------------------------------------------
+//---------|-|--|-|--------------------------------------------------------------------------------------------------------------------------
+//---------|--||--|--------------------------------------------------------------------------------------------------------------------------
+//---------|------|--------------------------------------------------------------------------------------------------------------------------
+//---------|------|--------------------------------------------------------------------------------------------------------------------------
+//---------|------|--------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+        if(comm=='.TTT2'){
+            if(message.mentions.members.first()===undefined){
+                message.channel.send("@ a alguien para jugar");
+            }else{
+                var boton=[], jugador=[], pieza='🔴',fin=false, cont=0, turno = Math.floor(Math.random() * 2), accion='select', redo=false, ant=99, obs='-'; 
+                jugador[0]=message.author.id, jugador[1]=message.mentions.members.first().id;
+                
+                if(turno==0){
+                    turno=1;pieza='🔵';
+                }else{
+                    turno=0;pieza='🔴';
+                }
+
+                for (let index = 0; index < 9; index++) {
+                    boton[index]={type: 2, label: "-", style: 'SECONDARY', custom_id: index, disabled: false};
+                }
+
+                Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+                .setTitle('TaTeTi').setThumbnail(message.author.avatarURL())
+                .addFields({ name: 'Partida: ', value: `${message.author.username} VS ${message.mentions.members.first()}`, inline: false },);
+                
+                message.channel.send({embeds: [Membed],
+                    components: [
+                        {type: 1, components: [
+                                {type: 2, label: "Aceptar", style: 'SUCCESS', custom_id: "aceptar"},
+                                {type: 2, label: "Rechazar", style: 'DANGER', custom_id: "rechazar"},
+                        ]},
+                    ]
+                });
+
+                const filter = i => i.customId === 'aceptar'||'rechazar'||"1"||"2"||"3"||"4"||"5"||"6"||"7"||"8"||"0";
+                const collector = message.channel.createMessageComponentCollector({ filter, time: 30000 });
+
+                collector.on('collect', async i => {
+                    if (i.customId == 'aceptar' && i.user.id==jugador[1]) {
+                        collector.resetTimer();
+                        Membed.addFields({ name: '--------------------------------------', value: `Partida aceptada, empieza ${'<@'+jugador[turno]+'>'} con `+pieza, inline: false },);
+                        Membed.addFields({ name: 'Observaciones:', value: obs, inline: false },);
+                        i.update({embeds: [Membed],
+                            components: [
+                                {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                            ] 
+                        });
+                    }else if(i.customId=='rechazar' && i.user.id==jugador[1]){
+                        Membed.addFields({ name: '--------------------------------------', value: 'Partida rechazada', inline: false },);
+                        i.update({embeds: [Membed], components: [] });
+                        fin=true;
+                        collector.stop()
+                    }else{
+                        if(i.user.id==jugador[turno]){
+                            collector.resetTimer();
+                            cont++;
+                            if(cont<=6){
+                                for (let index = 0; index < 9; index++) {
+                                    if(i.customId==boton[index].custom_id && boton[index].label=='-'){
+                                        boton[index].label=pieza;
+                                        i.update({embeds: [Membed],
+                                            components: [
+                                                {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                            ] 
+                                        });
+                                    }else if(i.customId==boton[index].custom_id && boton[index].label!='-'){
+                                        obs+=`${'<@'+jugador[turno]+'>'} selecciona una de tus fichas \n`;
+                                        Membed.fields[2]= { name: '--------------------------------------', value: obs, inline: false };
+                                        i.update({embeds: [Membed],
+                                            components: [
+                                                {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                            ] 
+                                        });
+                                        redo=true;
+                                        cont--;
+                                    }
+                                }
+                            }else{
+                                if(accion=='select'){
+                                    for (let index = 0; index < 9; index++) {
+                                        if(i.customId==boton[index].custom_id && pieza==boton[index].label){
+                                            ant=index;
+                                            boton[index].style='SUCCESS';
+                                            i.update({embeds: [Membed],
+                                                components: [
+                                                    {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                    {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                    {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                                ] 
+                                            });
+                                            accion='mover';
+                                        }else if(i.customId==boton[index].custom_id && pieza!=boton[index].label){
+                                            obs+=`${'<@'+jugador[turno]+'>'} selecciona una de tus fichas \n`;
+                                            Membed.fields[2]= { name: '--------------------------------------', value: obs, inline: false };
+                                            i.update({embeds: [Membed],
+                                                components: [
+                                                    {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                    {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                    {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                                ] 
+                                            });
+                                            redo=true;
+                                        }
+                                    }
+                                    redo=true;
+                                }else if(accion=='mover'){
+                                    for (let index = 0; index < 9; index++) {
+                                        if(i.customId==boton[index].custom_id && boton[index].label=='-'){
+                                            boton[index].style='SECONDARY';
+                                            boton[index].label=pieza;
+                                            boton[ant].label='-';
+                                            boton[ant].style='SECONDARY';
+                                            i.update({embeds: [Membed],
+                                                components: [
+                                                    {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                    {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                    {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                                ] 
+                                            });
+                                            accion='select'
+                                        }else if(i.customId==boton[index].custom_id ){
+                                            obs+=`${'<@'+jugador[turno]+'>'} no se puede mover la ficha a dicho lugar \n`;
+                                            Membed.fields[2]= { name: '--------------------------------------', value: obs, inline: false };
+                                            i.update({embeds: [Membed],
+                                                components: [
+                                                    {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                    {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                    {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                                ] 
+                                            });
+                                            redo=true;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if( (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-') || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-') || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-') 
+                            || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-') || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-') || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-')
+                            || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[8].label!='-') || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-') )
+                            {
+                                message.channel.send(`${'<@'+jugador[turno]+'>'} gano la partida`);
+                                fin=true;
+                                collector.stop();
+                            }
+
+                            if(redo==true){
+                                redo=false;
+                            }else if(turno==0){
+                                turno=1;pieza='🔵';
+                            }else if(turno==1){
                                 turno=0;pieza='🔴';
                             }
                         }
