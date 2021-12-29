@@ -113,7 +113,7 @@ client.on('ready', () =>{
         const comm = args.shift().toLowerCase();
         const Membed = new Discord.MessageEmbed();
 
-        if(comm.match(/^\.(?!play|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona|comandos|disconnect|tateti)/g)){
+        if(comm.match(/^\.(?!play|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona|comandos|disconnect|ttt||ttt2)/g)){
             message.channel.send('Comando equivocado');
         }
 
@@ -539,7 +539,7 @@ client.on('ready', () =>{
 //---------|------|--------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
-        if(comm=='.TTTog'){
+        if(comm=='.ttt'){
             if(message.mentions.members.first()===undefined){
                 message.channel.send("@ a alguien para jugar");
             }else{
@@ -596,16 +596,68 @@ client.on('ready', () =>{
                                 if(i.customId==boton[index].custom_id){
                                     boton[index].label=pieza;
                                     boton[index].disabled=true
-                                    i.update({embeds: [Membed],
-                                        components: [
-                                            {type: 1, components: [ boton[0], boton[1], boton[2], ]},
-                                            {type: 1, components: [ boton[3], boton[4], boton[5], ]},
-                                            {type: 1, components: [ boton[6], boton[7], boton[8], ]},
-                                        ] 
-                                    });
+                                    if( (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-') || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-') || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-') || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-') || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-') || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-') || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[8].label!='-') || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-') ){
+                                        switch (true) {
+                                            case (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-'):
+                                                boton[0].style='SUCCESS';boton[1].style='SUCCESS';boton[2].style='SUCCESS';
+                                                break;
+                                            case (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-'):
+                                                boton[3].style='SUCCESS';boton[4].style='SUCCESS';boton[5].style='SUCCESS';
+                                                break;
+                                            case (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-'):
+                                                boton[6].style='SUCCESS';boton[7].style='SUCCESS';boton[8].style='SUCCESS';
+                                                break;
+                                            case (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-'):
+                                                boton[0].style='SUCCESS';boton[3].style='SUCCESS';boton[6].style='SUCCESS';
+                                                break;
+                                            case (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-'):
+                                                boton[1].style='SUCCESS';boton[4].style='SUCCESS';boton[7].style='SUCCESS';
+                                                break;
+                                            case (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-'):
+                                                boton[2].style='SUCCESS';boton[5].style='SUCCESS';boton[8].style='SUCCESS';
+                                                break;
+                                            case (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[8].label!='-'):
+                                                boton[0].style='SUCCESS';boton[4].style='SUCCESS';boton[8].style='SUCCESS';
+                                                break;
+                                            case (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-'):
+                                                boton[2].style='SUCCESS';boton[4].style='SUCCESS';boton[8].style='SUCCESS';
+                                                break;
+                                        }
+                                        //message.channel.send(`${'<@'+jugador[turno]+'>'} gano la partida`);
+                                        Membed.addFields({ name: 'Resultado:', value: `${'<@'+jugador[turno]+'>'} gano la partida`, inline: false },);
+                                        fin=true;
+                                        i.update({embeds: [Membed],
+                                            components: [
+                                                {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                            ] 
+                                        });
+                                        collector.stop();
+                                    }else if(cont==9){
+                                        //message.channel.send('Empate');
+                                        Membed.addFields({ name: 'Resultado:', value: 'Empate', inline: false },);
+                                        fin=true;
+                                        i.update({embeds: [Membed],
+                                            components: [
+                                                {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                            ] 
+                                        });
+                                        collector.stop()
+                                    }else{
+                                        i.update({embeds: [Membed],
+                                            components: [
+                                                {type: 1, components: [ boton[0], boton[1], boton[2], ]},
+                                                {type: 1, components: [ boton[3], boton[4], boton[5], ]},
+                                                {type: 1, components: [ boton[6], boton[7], boton[8], ]},
+                                            ] 
+                                        });
+                                    }
                                 }
                             }
-                            if( (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-') || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-') || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-') 
+                            /*if( (boton[0].label==boton[1].label && boton[1].label==boton[2].label && boton[2].label!='-') || (boton[3].label==boton[4].label && boton[4].label==boton[5].label && boton[5].label!='-') || (boton[6].label==boton[7].label && boton[7].label==boton[8].label && boton[8].label!='-') 
                             || (boton[0].label==boton[3].label && boton[3].label==boton[6].label && boton[6].label!='-') || (boton[1].label==boton[4].label && boton[4].label==boton[7].label && boton[7].label!='-') || (boton[2].label==boton[5].label && boton[5].label==boton[8].label && boton[8].label!='-')
                             || (boton[0].label==boton[4].label && boton[4].label==boton[8].label && boton[8].label!='-') || (boton[2].label==boton[4].label && boton[4].label==boton[6].label && boton[6].label!='-') )
                             {
@@ -616,7 +668,7 @@ client.on('ready', () =>{
                                 message.channel.send('Empate');
                                 fin=true;
                                 collector.stop()
-                            }
+                            }*/
                             if(turno==0){
                                 turno=1;pieza='🔵';
                             }else{
@@ -643,7 +695,7 @@ client.on('ready', () =>{
 //---------|------|--------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
-        if(comm=='.TTT2'){
+        if(comm=='.ttt2'){
             if(message.mentions.members.first()===undefined){
                 message.channel.send("@ a alguien para jugar");
             }else{
