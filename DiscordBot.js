@@ -1,4 +1,3 @@
-//Token ODAxMzAxNDg1ODAzMDEyMTI2.YAesKQ.pFG7cC5CmZz_-hJYryhBkPRh4kg
 const { Client, MessageAttachment, Permissions ,Intents,MessageActionRow, MessageButton} = require('discord.js');
 const Discord = require('discord.js');
 const inspector = require('inspector');
@@ -8,7 +7,7 @@ const permissions = new Permissions(BigInt(41090560));
 //const client = new Discord.Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.GUILD_MESSAGE_REACTIONS] });
 const allIntents = new Intents(32767);
 const client = new Client({ intents: allIntents });
-
+require('dotenv').config();
 const desc = ["Nacho, el niño virgo", "Barco, el bocho", "Alejo, la gorda", "Fer, el niño de cristal", "Yano, el autista", "Lotzo, el hippie", "Morgan <3", "Alva, El chichi Peralta", "Nacho, el simp", "Eroncho, ¿Jugó Platini?"];
 const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>"
 const frase = ["Ño Ño", "MUY pelotudo!", "Per di da zo", "Este tipo está quemado", "Dea dea", "No me la container", "No da más de pelotudo", "Sí nene", "Dale negrito", "Se va muteado", "Bien muteado", "Bien muerto", "Olvidafter", "Niño de cristal", "Poco huevo", "Naaaashe", "Ido", "MOOOY PICUSO", "EL REY"];
@@ -896,5 +895,4 @@ client.on('ready', () =>{
 
 
 
-
-client.login("ODAxMzAxNDg1ODAzMDEyMTI2.YAesKQ.pFG7cC5CmZz_-hJYryhBkPRh4kg");
+client.login(process.env.token);
