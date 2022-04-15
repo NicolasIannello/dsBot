@@ -1,32 +1,27 @@
 const { Client, MessageAttachment, Permissions ,Intents,MessageActionRow, MessageButton} = require('discord.js');
 const Discord = require('discord.js');
 const inspector = require('inspector');
-const ytdl = require('ytdl-core');
-const ytSearch = require('yt-search');
 const permissions = new Permissions(BigInt(41090560));
-//const client = new Discord.Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.GUILD_MESSAGE_REACTIONS] });
 const allIntents = new Intents(32767);
 const client = new Client({ intents: allIntents });
 require('dotenv').config();
 const desc = ["Nacho, el niño virgo", "Barco, el bocho", "Alejo, la gorda", "Fer, el niño de cristal", "Yano, el autista", "Lotzo, el hippie", "Morgan <3", "Alva, El chichi Peralta", "Nacho, el simp", "Eroncho, ¿Jugó Platini?"];
-const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>"
+const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>\n.playlist\n.ttt\n.ttt2"
 const frase = ["Ño Ño", "MUY pelotudo!", "Per di da zo", "Este tipo está quemado", "Dea dea", "No me la container", "No da más de pelotudo", "Sí nene", "Dale negrito", "Se va muteado", "Bien muteado", "Bien muerto", "Olvidafter", "Niño de cristal", "Poco huevo", "Naaaashe", "Ido", "MOOOY PICUSO", "EL REY"];
 const boca = ["https://imgur.com/MW4zdiA.png", "https://imgur.com/riL4WUY.png", "https://imgur.com/Qbvaevv.png", "https://imgur.com/cJRRTgA.png", "https://imgur.com/XiM7gGc.png", "https://imgur.com/iCs5PQU.png", "https://imgur.com/PBElkZ0.png", "https://imgur.com/3frkUvM.png", "https://imgur.com/nbAuGtd.png", "https://imgur.com/aG0BPWa.png"]
-let DJ;
 const prefix = ".";
-//const fmove=require('./comms/move.js');
+const Playlist=require('./comms/playlist.js');
+const play=require('./comms/play.js');
 const { joinVoiceChannel,createAudioPlayer,createAudioResource,entersState,StreamType,AudioPlayerStatus,VoiceConnectionStatus, } = require('@discordjs/voice');
-const { match } = require('assert');
-var isPlaying=false;
-var queue=[];
-var tiempo=0;
+const playcommandos='.playlist crear <nombre de playlist>\n.playlist añadir "nombre playlist" <nombre cancion>\n.playlist play <nombre playlist>\n.playlist shuffle <nombre playlist>\n.playlist publica/privada <nombre playlist>\n.playlist info <nombre playlist>\n.playlist eliminar <nombre playlist>'
 
 client.on('ready', () =>{
     console.log("Connected as " + client.user.tag)
-    //let prefix = ".";
     client.user.setActivity('a BocaOOOAAAAAOAOAOAOAAO', { type: 'WATCHING' })//.then(presence=>console.log(`Activity set to ${presence.activities[0].name}`)).catch(console.error);
 
     client.on('messageCreate',async message => {
+        const Membed = new Discord.MessageEmbed();
+
         if(message.content === prefix + 'peron'){
             const attach = new MessageAttachment("https://imgur.com/GUVB93l.png")
             message.channel.send(attach);
@@ -35,26 +30,6 @@ client.on('ready', () =>{
             const attach = new MessageAttachment("https://imgur.com/0kMQabL.png")
             message.channel.send(attach);
         }
-        /*if(message.content === prefix + 'masgrande'){
-            var randomValue = boca[Math.floor(Math.random() * boca.length)];
-            const attach = new MessageAttachment(randomValue);
-            message.channel.send(`${message.author},`, attach);
-
-            let voiceChannel = message.member.voice.channel;
-            if(!voiceChannel) return message.channel.send('¡Necesitas unirte a un canal de voz primero!.');
-
-            const streamOptions = { seek: 0, volume: 1 };
-            voiceChannel.join().then(connection => {
-                const url = ytdl("https://www.youtube.com/watch?v=Emp7ntPJm2w&ab_channel=chicho641", { filter : 'audioonly' });
-                const dispatcher = connection.playStream(url, streamOptions);
-                dispatcher.on("end", end => {
-                    console.log("left channel");
-                    voiceChannel.leave();
-                });
-                message.channel.send('Reproduciendo ahora: LA 12 PAPÁ');
-                message.delete();
-            }).catch(err => console.log(err));
-        }*/
         if(message.content == prefix + 'cristal'){
             message.channel.send("El top se actualizo!")
             message.channel.send("Top 5 niños de cristal: \n 1) Eroncho.\n 2) Fernan floo.\n 3) Lotzo.\n 4) Luxipoo.\n 5) Alejo \"Tetona\" Marquez.  ");
@@ -81,10 +56,13 @@ client.on('ready', () =>{
                 .setImage(serverIcon)
                 .setFooter('CIVUS',serverIcon)
                 .setTimestamp()
-                message.channel.send(infosv);
+            message.channel.send(infosv);
         }
         if(message.content === prefix + 'comandos'){
-                message.channel.send(comandos.toString())
+            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            .addFields({ name: 'comandos: ', value: comandos, inline: true },);
+
+            message.channel.send({embeds: [Membed]});
         }
         if(message.content === prefix + 'tetona'){
             const attach = new MessageAttachment("https://imgur.com/q5FFURg.png")
@@ -100,25 +78,16 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         //const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const args = message.content.split(/ +/g);
         const comm = args.shift().toLowerCase();
-        const Membed = new Discord.MessageEmbed();
 
-        if(comm.match(/^\.(?!play|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona|comandos|disconnect|ttt||ttt2)/g)){
+        /*if(comm.match(/^\.(play|playlist|pool|mute|deaf|move|peron|virgo|masgrande|lumpen|svinfo|frase|tetona|comandos|disconnect|test|ttt||ttt2)/g)!=null){
             message.channel.send('Comando equivocado');
-        }
+        }*/
 
         if(comm==='.move'){
             console.log(comm+' || '+Date()+` || ${message.author.username}`);
-            //message.channel.send(fmove.move(message.mentions.members.first(), message.mentions.members.first().voice.channel.id, args))
             var canales=['479806401338933262',  //eskere
                         '684237944831213624',   //dois
                         '706349634708045854',   //virgolos
@@ -174,13 +143,6 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm==='.mute' || comm==='.deaf'){
             console.log(comm+' || '+Date()+` || ${message.author.username}`);
 
@@ -213,7 +175,6 @@ client.on('ready', () =>{
                         }
                         Membed
                         .setDescription(`${muteo} por `+args[1]+'s');
-                       // var mensaje='Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear a ${muteo}`+" por "+args[1]+'s';
                     }else{
                         gil=true;
                         Membed.setTitle('Se fue al choto')
@@ -222,7 +183,6 @@ client.on('ready', () =>{
                         }else{
                             Membed.setDescription(`Ensordecer por `+args[1]+'s');
                         }
-                        //var mensaje=`Se fue al choto ${message.author}.  `+'Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear al gil de ${message.author}`;
                     }
                 }else{
                     throw "jejox";
@@ -255,10 +215,8 @@ client.on('ready', () =>{
                                     if(gil==true){
                                         Membed.fields[0] = { name: "Votos a favor", value: si+'/'+i, inline: true };
                                         embdReact.edit({embeds: [Membed]});
-                                        //embdReact.edit(`Se fue al choto ${message.author}.  `+'Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear al gil de ${message.author}`);
                                     }else{
                                         Membed.fields[0] = { name: "Votos a favor", value: si+'/'+i, inline: true };
-                                        //embdReact.edit('Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear a ${muteo}`+" por "+args[1]+'s');
                                         embdReact.edit({embeds: [Membed]});
                                     }
                                 }else if(reaction.emoji.name==='🟥'){
@@ -266,11 +224,9 @@ client.on('ready', () =>{
                                     if(gil==true){
                                         Membed.fields[1] = { name: 'Votos en contra', value: no+'/'+i, inline: true };
                                         embdReact.edit({embeds: [Membed]});
-                                        //embdReact.edit(`Se fue al choto ${message.author}.  `+'Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear al gil de ${message.author}`);
                                     }else{
                                         Membed.fields[1] = { name: 'Votos en contra', value: no+'/'+i, inline: true };
                                         embdReact.edit({embeds: [Membed]});
-                                        //embdReact.edit('Votos a favor '+si+'/'+i+', votos en contra '+no+'/'+i+` para mutear a ${muteo}`+" por "+args[1]+'s');
                                     }
                                 }
                                 if(si>=i){
@@ -283,7 +239,6 @@ client.on('ready', () =>{
                                 }else if(no>=i){
                                     Membed.addFields({ name: `----------------------------------------`, value: `${muteo} safo, cagones`, inline: false },);
                                     embdReact.edit({embeds: [Membed]});
-                                    //message.channel.send("Safaste pipi");
                                     collector.stop();
                                 }
                             }else if(users.miembro==user && users.voto==true && reaction.emoji.name!='⛔'){
@@ -296,7 +251,6 @@ client.on('ready', () =>{
                                 }else if(gil==false){
                                     Membed.addFields({ name: "Se cancelo la votacion", value: 'CAGON', inline: false },);
                                     embdReact.edit({embeds: [Membed]});
-                                   // embdReact.edit(`${user} cancelo la votacion`);
                                     collector.stop();
                                 }
                             }
@@ -308,32 +262,26 @@ client.on('ready', () =>{
                             setTimeout(()=>{ 
                                 muteo.voice.setMute(false);
                             },segundos);
-                            //message.channel.send("Mutea3");
                             Membed.addFields({ name:`----------------------------------------`, value: `${muteo} se fue mutea3, fucking virgil`, inline: false },);
                         }else{
                             muteo.voice.setDeaf(true);
                             setTimeout(()=>{ 
                                 muteo.voice.setDeaf(false);
                             },segundos);
-                            //message.channel.send("Ensordeci3");
                             Membed.addFields({ name:`----------------------------------------`, value: `${muteo} se fue ensordeci3, fucking virgil`, inline: false },);
                         }
                         embdReact.edit({embeds: [Membed]});
                     }
                     function Gil(){
-                        //muteo=message.member;
-                        //muteo.voice.setMute(true);
                         if(comm==="mute"){
                             message.member.voice.setMute(true);
                             setTimeout(()=>{ 
-                                //muteo.voice.setMute(false);
                                 message.member.voice.setMute(false);
                             },segundos);
                             message.channel.send("Mutea3");
                         }else{
                             message.member.voice.setDeaf(true);
                             setTimeout(()=>{ 
-                                //muteo.voice.setMute(false);
                                 message.member.voice.setDeaf(false);
                             },segundos);
                             message.channel.send("Ensordeci3");
@@ -343,19 +291,11 @@ client.on('ready', () =>{
 
             }catch(error){
                 message.channel.send("Argumentos inválidos virgil :(");
-                //message.channel.send(error);
             }
         }
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
-//---------|-|--|-|--------------------------------------------------------------------------------------------------------------------------
-//---------|--||--|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm==='.pool'){
             var emo=['⬜','🟥','🟩','🟦','🟨','🟪','🟫','🟦','🟧','⬛'], a=10, votos=[], users=[];
             console.log(comm+' || '+Date()+` || ${message.author.username}`);
@@ -368,7 +308,6 @@ client.on('ready', () =>{
             for(let member of list.members){
                 var objeto = { miembro:member[1].id,voto:false}
                 users.push(objeto);
-                //console.log(member[1].id);
             }
 
             Membed.setColor('#0099ff')/*.setAuthor(datos)*/.setThumbnail(message.guild.iconURL())
@@ -429,75 +368,14 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
-//---------|-|--|-|--------------------------------------------------------------------------------------------------------------------------
-//---------|--||--|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm==='.play'){
             console.log(comm+' || '+Date()+` || ${message.author.username}`);
-            try {                
-                const connection = await joinVoiceChannel({
-                    channelId: message.member.voice.channel.id,
-                    guildId: message.guild.id,
-                    adapterCreator: message.guild.voiceAdapterCreator
-                })
-               
-                const videoFinder = async (query) =>{
-                    const videoResult= await ytSearch(query);
-                    return (videoResult.videos.length>1)? videoResult.videos[0] : null;
-                }
-                const video= await videoFinder(args.join(' '));
-                if(video){
-                    const player = createAudioPlayer();
-                    const stream = ytdl(video.url,{filter:'audioonly',highWaterMark: 1 << 25,});
-                    const rsrc = createAudioResource(stream,{inputType:StreamType.Arbitrary});
-                    queue.push(rsrc)
-                    var duracion = video.duration.toString().split(/ +/g);
-                    tiempo = (parseInt(duracion[0])+3)*1000
-                    
-                    if(isPlaying==false){
-                        play();
-                    }
-
-                    function play (){
-                        connection.subscribe(player);
-                        player.play(queue[0]);
-                        isPlaying=true
-                        setTimeout(() => {
-                            queue.shift()
-                            if(queue.length>0){
-                                play();
-                            }else{
-                                try {
-                                    connection.destroy(); 
-                                } catch (error) {
-                                    console.log(error);
-                                }  
-                                isPlaying=false; 
-                            }
-                        }, tiempo);
-                    }
-    
-                    message.channel.send(video.url+" ");
-                    message.channel.send(video.duration.toString());
-                }
-            } catch (error) {
-                message.channel.send('No se encontro ningun video >:| '+error);
-            }
+       
+            play.reproducir(message,args,false);
         }
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
-//---------|-|--|-|--------------------------------------------------------------------------------------------------------------------------
-//---------|--||--|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm=='.masgrande'){
             var randomValue = boca[Math.floor(Math.random() * boca.length)];
 
@@ -531,13 +409,6 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
-//---------|-|--|-|--------------------------------------------------------------------------------------------------------------------------
-//---------|--||--|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm=='.ttt'){
             if(message.mentions.members.first()===undefined){
                 message.channel.send("@ a alguien para jugar");
@@ -622,7 +493,6 @@ client.on('ready', () =>{
                                                 boton[2].style='SUCCESS';boton[4].style='SUCCESS';boton[8].style='SUCCESS';
                                                 break;
                                         }
-                                        //message.channel.send(`${'<@'+jugador[turno]+'>'} gano la partida`);
                                         Membed.addFields({ name: 'Resultado:', value: `${'<@'+jugador[turno]+'>'} gano la partida`, inline: false },);
                                         fin=true;
                                         i.update({embeds: [Membed],
@@ -634,7 +504,6 @@ client.on('ready', () =>{
                                         });
                                         collector.stop();
                                     }else if(cont==9){
-                                        //message.channel.send('Empate');
                                         Membed.addFields({ name: 'Resultado:', value: 'Empate', inline: false },);
                                         fin=true;
                                         i.update({embeds: [Membed],
@@ -687,13 +556,6 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
-//---------|-|--|-|--------------------------------------------------------------------------------------------------------------------------
-//---------|--||--|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm=='.ttt2'){
             if(message.mentions.members.first()===undefined){
                 message.channel.send("@ a alguien para jugar");
@@ -862,37 +724,56 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
-//---------|-|--|-|--------------------------------------------------------------------------------------------------------------------------
-//---------|--||--|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//---------|------|--------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------------
         if(comm=='.disconnect'){
-            joinVoiceChannel({
-                channelId: message.member.voice.channel.id,
-                guildId: message.guild.id,
-                adapterCreator: message.guild.voiceAdapterCreator
-            }).destroy();
-            message.channel.send('Chao');
-            isPlaying=false; queue=[]
+            play.chao(message);
         }
-        
-    //-----------------------------------------------------------------------------------------------------------------------------------------------------
-        
-        
-        
-        channel = client.channels.cache.get('751881070324219956');
-    
-        //if(message.content != prefix + 'peron' || message.content != prefix + 'virgo' || message.content != prefix + 'big' || message.content != prefix + 'user' || message.content != prefix + 'svinfo' || message.content != prefix + 'command'){
-            //message.channel.send("Comando equivocado, coco");
-        //}
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//---------||----||--------------------------------------------------------------------------------------------------------------------------
+        if(comm=='.skip'){
+            play.skip(message);
+        }
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//---------||----||--------------------------------------------------------------------------------------------------------------------------
+        if(comm=='.playlist'){
+            switch (args.shift()) {
+                case 'crear': 
+                    Playlist.crear(message,args,Membed);
+                    break;
+                case 'añadir':
+                    Playlist.añadir(message,args,Membed);
+                    break;
+                case 'eliminar':
+                    Playlist.eliminar(message,args,Membed);
+                    break;
+                case 'play':
+                    Playlist.playl(message,args,Membed,'play'); 
+                    break;
+                case 'shuffle':
+                    Playlist.playl(message,args,Membed,'shuffle');  
+                    break;    
+                case 'publica':
+                    Playlist.estado(message,args,Membed,'true');
+                    break;
+                case 'privada':
+                    Playlist.estado(message,args,Membed,'false');
+                    break;
+                case 'info':
+                    Playlist.info(message,args,Membed);
+                    break;
+                default:
+                    Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+                    .addFields({ name: 'comandos de .playlist: ', value: playcommandos, inline: true },);
 
+                    message.channel.send({embeds: [Membed]});
+                    break;
+            }
+        }
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+        channel = client.channels.cache.get('751881070324219956');
     });
 
 });
-
-
 
 client.login(process.env.token);
