@@ -6,12 +6,13 @@ const allIntents = new Intents(32767);
 const client = new Client({ intents: allIntents });
 require('dotenv').config();
 const desc = ["Nacho, el niño virgo", "Barco, el bocho", "Alejo, la gorda", "Fer, el niño de cristal", "Yano, el autista", "Lotzo, el hippie", "Morgan <3", "Alva, El chichi Peralta", "Nacho, el simp", "Eroncho, ¿Jugó Platini?"];
-const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>\n.playlist\n.ttt\n.ttt2"
+const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>\n.playlist\n.ttt\n.ttt2\.brawl"
 const frase = ["Ño Ño", "MUY pelotudo!", "Per di da zo", "Este tipo está quemado", "Dea dea", "No me la container", "No da más de pelotudo", "Sí nene", "Dale negrito", "Se va muteado", "Bien muteado", "Bien muerto", "Olvidafter", "Niño de cristal", "Poco huevo", "Naaaashe", "Ido", "MOOOY PICUSO", "EL REY"];
 const boca = ["https://imgur.com/MW4zdiA.png", "https://imgur.com/riL4WUY.png", "https://imgur.com/Qbvaevv.png", "https://imgur.com/cJRRTgA.png", "https://imgur.com/XiM7gGc.png", "https://imgur.com/iCs5PQU.png", "https://imgur.com/PBElkZ0.png", "https://imgur.com/3frkUvM.png", "https://imgur.com/nbAuGtd.png", "https://imgur.com/aG0BPWa.png"]
 const prefix = ".";
 const Playlist=require('./comms/playlist.js');
 const play=require('./comms/play.js');
+const brawlhalla=require('./comms/brawlhalla.js');
 const { joinVoiceChannel,createAudioPlayer,createAudioResource,entersState,StreamType,AudioPlayerStatus,VoiceConnectionStatus, } = require('@discordjs/voice');
 const playcommandos='.playlist crear <nombre de playlist>\n.playlist añadir "nombre playlist" <nombre cancion>\n.playlist play <nombre playlist>\n.playlist shuffle <nombre playlist>\n.playlist publica/privada <nombre playlist>\n.playlist info <nombre playlist>\n.playlist eliminar <nombre playlist>'
 
@@ -732,6 +733,12 @@ client.on('ready', () =>{
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
         if(comm=='.skip'){
             play.skip(message);
+        }
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//---------||----||--------------------------------------------------------------------------------------------------------------------------
+        if(comm=='.brawl'){
+            brawlhalla.tweet(message);
         }
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
