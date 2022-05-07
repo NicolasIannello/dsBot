@@ -6,13 +6,13 @@ const allIntents = new Intents(32767);
 const client = new Client({ intents: allIntents });
 require('dotenv').config();
 const desc = ["Nacho, el niño virgo", "Barco, el bocho", "Alejo, la gorda", "Fer, el niño de cristal", "Yano, el autista", "Lotzo, el hippie", "Morgan <3", "Alva, El chichi Peralta", "Nacho, el simp", "Eroncho, ¿Jugó Platini?"];
-const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>\n.playlist\n.ttt\n.ttt2\.brawl"
+const comandos = ".peron\n.virgo\n.masgrande\n.lumpen\n.svinfo\n.frase\n.tetona\n.move @user <canal>\n.mute @user <segundos>\n.deaf @user <segundos>\n.play <cancion>\n.playlist\n.ttt\n.ttt2\n.brawl\ncasino"
 const frase = ["Ño Ño", "MUY pelotudo!", "Per di da zo", "Este tipo está quemado", "Dea dea", "No me la container", "No da más de pelotudo", "Sí nene", "Dale negrito", "Se va muteado", "Bien muteado", "Bien muerto", "Olvidafter", "Niño de cristal", "Poco huevo", "Naaaashe", "Ido", "MOOOY PICUSO", "EL REY"];
-const boca = ["https://imgur.com/MW4zdiA.png", "https://imgur.com/riL4WUY.png", "https://imgur.com/Qbvaevv.png", "https://imgur.com/cJRRTgA.png", "https://imgur.com/XiM7gGc.png", "https://imgur.com/iCs5PQU.png", "https://imgur.com/PBElkZ0.png", "https://imgur.com/3frkUvM.png", "https://imgur.com/nbAuGtd.png", "https://imgur.com/aG0BPWa.png"]
 const prefix = ".";
 const Playlist=require('./comms/playlist.js');
 const play=require('./comms/play.js');
 const brawlhalla=require('./comms/brawlhalla.js');
+const casino=require('./comms/casino.js');
 const { joinVoiceChannel,createAudioPlayer,createAudioResource,entersState,StreamType,AudioPlayerStatus,VoiceConnectionStatus, } = require('@discordjs/voice');
 const playcommandos='.playlist crear <nombre de playlist>\n.playlist añadir "nombre playlist" <nombre cancion>\n.playlist play <nombre playlist>\n.playlist shuffle <nombre playlist>\n.playlist publica/privada <nombre playlist>\n.playlist info <nombre playlist>\n.playlist eliminar <nombre playlist>'
 
@@ -55,12 +55,12 @@ client.on('ready', () =>{
                 .addField("Dueño", `${message.guild.owner}`, true)
                 .addField('Miembros', '`' + message.guild.memberCount + '`', true)
                 .setImage(serverIcon)
-                .setFooter('CIVUS',serverIcon)
+                .setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                 .setTimestamp()
             message.channel.send(infosv);
         }
         if(message.content === prefix + 'comandos'){
-            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
             .addFields({ name: 'comandos: ', value: comandos, inline: true },);
 
             message.channel.send({embeds: [Membed]});
@@ -165,7 +165,7 @@ client.on('ready', () =>{
                 .addFields(
                     { name: "Votos a favor", value: si+'/'+i, inline: true },
                     { name: 'Votos en contra', value: no+'/'+i, inline: true },
-                ).setTimestamp().setFooter('CIVUS', message.guild.iconURL());
+                ).setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()});
                 
                 if(typeof args[1] == "string" && isNaN(segundos)==false){
                     if(parseInt(args[1])<=60){   
@@ -312,7 +312,7 @@ client.on('ready', () =>{
             }
 
             Membed.setColor('#0099ff')/*.setAuthor(datos)*/.setThumbnail(message.guild.iconURL())
-            .setTimestamp().setFooter('CIVUS', message.guild.iconURL()).setTitle('Inicio una votacion');
+            .setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()}).setTitle('Inicio una votacion');
                     
             for (let index = 0; index<a; index++) {
                 Membed.addFields({ name: args[index], value: 'Sin votos', inline: false },)
@@ -378,34 +378,7 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
         if(comm=='.masgrande'){
-            var randomValue = boca[Math.floor(Math.random() * boca.length)];
-
-            const connection = await joinVoiceChannel({
-                channelId: message.member.voice.channel.id,
-                guildId: message.guild.id,
-                adapterCreator: message.guild.voiceAdapterCreator
-            })
-            
-            const player = createAudioPlayer();
-            const stream = ytdl("https://www.youtube.com/watch?v=Emp7ntPJm2w&ab_channel=chicho641",{filter:'audioonly',highWaterMark: 1 << 25,});
-            const rsrc = createAudioResource(stream,{inputType:StreamType.Arbitrary});
-                    
-            connection.subscribe(player);
-            player.play(rsrc);
-                        
-            setTimeout(() => {
-                try {
-                    connection.destroy(); 
-                } catch (error) {
-                    console.log(error);
-                }  
-            }, 150000);
-
-            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
-            /*.setTitle(`${message.author.username}`)*/.setImage(randomValue)
-            .addFields({ name: 'Reproduciendo ahora: ', value: 'LA 12 PAPÁ', inline: false },);
-
-            message.channel.send({embeds: [Membed]});
+            play.masgrande(message,Membed);
         }
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
@@ -427,7 +400,7 @@ client.on('ready', () =>{
                     boton[index]={type: 2, label: "-", style: 'SECONDARY', custom_id: index, disabled: false};
                 }
 
-                Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+                Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                 .setTitle('TaTeTi').setThumbnail(message.author.avatarURL())
                 .addFields({ name: 'Partida: ', value: `${message.author.username} VS ${message.mentions.members.first()}`, inline: false },);
                 
@@ -574,7 +547,7 @@ client.on('ready', () =>{
                     boton[index]={type: 2, label: "-", style: 'SECONDARY', custom_id: index, disabled: false};
                 }
 
-                Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+                Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                 .setTitle('TaTeTi').setThumbnail(message.author.avatarURL())
                 .addFields({ name: 'Partida: ', value: `${message.author.username} VS ${message.mentions.members.first()}`, inline: false },);
                 
@@ -743,6 +716,12 @@ client.on('ready', () =>{
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //---------||----||--------------------------------------------------------------------------------------------------------------------------
+        if(comm=='.casino'){
+            casino.casino(message,args,Membed);
+        }
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//---------||----||--------------------------------------------------------------------------------------------------------------------------
         if(comm=='.playlist'){
             switch (args.shift()) {
                 case 'crear': 
@@ -770,7 +749,7 @@ client.on('ready', () =>{
                     Playlist.info(message,args,Membed);
                     break;
                 default:
-                    Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+                    Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                     .addFields({ name: 'comandos de .playlist: ', value: playcommandos, inline: true },);
 
                     message.channel.send({embeds: [Membed]});
