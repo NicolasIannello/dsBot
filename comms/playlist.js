@@ -1,3 +1,4 @@
+const ytSearch = require('yt-search');
 var mysql = require('mysql');
 const play=require('./play.js');
 
@@ -19,7 +20,7 @@ function crear(message,args,Membed){
          if (err) throw err;
 
          if (result=='' || result==[]) {
-            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
             .addFields({ name: '¿Desea crear la playlist: ', value: args.join(' ')+' ?', inline: true },);
 
             message.channel.send({embeds: [Membed]}).then(embdReact => {
@@ -61,7 +62,7 @@ function crear(message,args,Membed){
                })
             })
          }else{
-            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
             .addFields({ name: 'Ya existe una playlist con el nombre: ', value: args.join(' '), inline: false },);
 
             message.channel.send({embeds: [Membed]});
@@ -98,13 +99,13 @@ async function añadir(message,args,Membed){
          if (err) throw err;
 
          if (result=="" || result==[]) {
-            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
             .addFields({ name: 'No se encontro la playlist: ', value: a[1], inline: true },);
 
             message.channel.send({embeds: [Membed]});
             con.end();
          }else if(result[0].Colaborativa=="false" && result[0].Creador!=message.author.id){
-            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
             .addFields({ name: 'La playlist "'+a[1]+'" no es colaborativa.', value: `Por favor contactese con <@${result[0].Creador}>`, inline: true },);
 
             message.channel.send({embeds: [Membed]});
@@ -113,7 +114,7 @@ async function añadir(message,args,Membed){
             if(video){
                var IDpl=result[0].IDpl;
 
-               Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+               Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                .addFields({ name: 'Agregar cancion: ', value: video.url, inline: false },)
                .addFields({ name: 'A playlist: ', value: a[1], inline: false },);
                
@@ -156,7 +157,7 @@ async function añadir(message,args,Membed){
                   });
                });
             }else{
-               Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+               Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                .addFields({ name: 'No se encontro la cancion: ', value: a[2], inline: true },);
                embdReact.edit({embeds: [Membed]});
                con.end();            
@@ -185,7 +186,7 @@ function playl(message,args,Membed,tipo){
          if (err) throw err;
          
          if (result=="" || result==[]) {
-            Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+            Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
             .addFields({ name: 'No se encontro la playlist: ', value: a[1], inline: true },);
 
             message.channel.send({embeds: [Membed]});
@@ -210,7 +211,7 @@ function playl(message,args,Membed,tipo){
                   play.reproducir(message,element.url,true);
                });
 
-               Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+               Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                .addFields({ name: 'Reproduciendo playlist: ', value: args.join(' '), inline: false },);
                message.channel.send({embeds: [Membed]});
             });
@@ -235,13 +236,13 @@ function estado(message,args,Membed,estado){
       if (err) throw err;
 
       if (result=="" || result==[]) {
-         Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+         Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
          .addFields({ name: 'No se encontro la playlist: ', value: args.join(' '), inline: true },);
 
          message.channel.send({embeds: [Membed]});
          con.end();
       }else if(result[0].Creador!=message.author.id){
-         Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+         Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
          .addFields({ name: 'La playlist "'+args.join(' ')+'" no es colaborativa.', value: `Por favor contactese con <@${result[0].Creador}>`, inline: true },);
 
          message.channel.send({embeds: [Membed]});
@@ -251,10 +252,10 @@ function estado(message,args,Membed,estado){
             if (err) throw err;
 
             if (estado=='true') {
-               Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+               Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                .addFields({ name: 'La playlist '+args.join(' '), value: 'ahora es colaborativa', inline: true },);
             }else{
-               Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+               Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
                .addFields({ name: 'La playlist '+args.join(' '), value: 'ya no es colaborativa', inline: true },);
             }
 
@@ -281,7 +282,7 @@ function info(message,args,Membed){
       if (err) throw err;
 
       if (result=="" || result==[]) {
-         Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+         Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
          .addFields({ name: 'No se encontro la playlist: ', value: args.join(' '), inline: true },);
 
          message.channel.send({embeds: [Membed]});
@@ -293,7 +294,7 @@ function info(message,args,Membed){
             canciones+=result[a].url+'\n';
          }
 
-         Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+         Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
          .addFields({ name: 'Playlist "'+args.join(' ')+'":', value: 'Canciones: '+result.length+'\nFecha creacion: '+result[0].Fecha+'\nCreador: '+`<@${result[0].Creador}>\nColaborativa: `+result[0].Colaborativa, inline: true },);
 
          message.channel.send({embeds: [Membed],components: [
@@ -341,7 +342,7 @@ function eliminar(message,args,Membed){
       if (err) throw err;
 
       if (result=="" || result==[]) {
-         Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+         Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
          .addFields({ name: 'No se encontro la playlist: ', value: args.join(' '), inline: true },);
 
          message.channel.send({embeds: [Membed]});
@@ -349,7 +350,7 @@ function eliminar(message,args,Membed){
       }else if (message.author.id==result[0].Creador){
          var id=result[0].IDpl,ok=false;
 
-         Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+         Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
          .addFields({ name: 'Esta por eliminar la playlist: ', value: args.join(' '), inline: false },)
                
          message.channel.send({embeds: [Membed]}).then(embdReact => {
@@ -391,7 +392,7 @@ function eliminar(message,args,Membed){
             });
          });
       }else{
-         Membed.setColor('#0099ff').setTimestamp().setFooter('CIVUS', message.guild.iconURL())
+         Membed.setColor('#0099ff').setTimestamp().setFooter({text: 'CIVUS', iconURL: message.guild.iconURL()})
          .addFields({ name: 'Usted no es el dueño de la playlist: ', value: args.join(' '), inline: true },);
 
          message.channel.send({embeds: [Membed]});
